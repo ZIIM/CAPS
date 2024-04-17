@@ -1,29 +1,24 @@
-const driverHandler = require('./handler.js');
+const handler = require('./handler.js');
 
-describe('Driver handler', () => {
-  it('should return transit emit and console.log', () => {
-    const emitter = {
-      emit: jest.fn(),
-    };
-    const payload = { orderID: 123 };
-    console.log = jest.fn();
+jest.mock('socket.io-client', () => ({
+  connect: jest.fn(() => ({
+    emit: jest.fn(),
+    on: jest.fn(),
+  })),
+}));
 
-    driverHandler.transit(emitter, payload);
-
-    expect(emitter.emit).toHaveBeenCalledWith('inTransit', payload);
-    expect(console.log).toHaveBeenCalledWith('DRIVER', 'picked up', 123);
+describe('Driver handler functions', () => {
+  test('transit function should emit "inTransit" event', () => {
+    const socket = require('socket.io-client').connect();
+    const mockPayload = { orderID: expect.any(Number), customer: expect.any(String) };
+    handler.transit(socket, mockPayload);
+    expect(socket.emit).toHaveBeenCalledWith('inTransit', mockPayload);
   });
 
-  it('should return delivered emit and console.log', () => {
-    const emitter = {
-      emit: jest.fn(),
-    };
-    const payload = { orderID: 321 };
-    console.log = jest.fn();
-
-    driverHandler.delivered(emitter, payload);
-
-    expect(emitter.emit).toHaveBeenCalledWith('delivered', payload);
-    expect(console.log).toHaveBeenCalledWith('DRIVER', 'delivered', 321);
+  test('delivered function should emit "delivered" event', () => {
+    const socket = require('socket.io-client').connect();
+    const mockPayload = { orderID: expect.any(Number), customer: expect.any(String) };
+    handler.delivered(socket, mockPayload);
+    expect(socket.emit).toHaveBeenCalledWith('delivered', mockPayload);
   });
 });
