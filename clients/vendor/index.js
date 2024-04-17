@@ -21,9 +21,9 @@ function delivered() {
     socket.on('delivered', () => {
       setTimeout(() => {
         console.log('VENDOR', 'Thank you for the delivery!');
-      }, 2000);
+      }, 1000);
     });
-  }, 2000);
+  }, 1000);
 }
 
 setInterval(() => {
