@@ -1,11 +1,20 @@
-function transit(events, payload) {
-  events.emit('inTransit', payload);
-  console.log('DRIVER', 'picked up', payload.orderID);
+function transit(socket, payload) {
+  setTimeout(() => {
+    console.log('DRIVER', 'picked up', payload);
+  }, 2000);
+
+  setTimeout(() => {
+    socket.emit('inTransit', payload);
+  }, 3000);
 }
-  
-function delivered(events, payload) {
-  events.emit('delivered', payload);
-  console.log('DRIVER', 'delivered', payload.orderID);
+
+function delivered(socket, payload) {
+  setTimeout(() => {
+    console.log('DRIVER', 'delivered', payload);
+  }, 2000);
+  setTimeout(() => {
+    socket.emit('delivered', payload);
+  }, 3000);
 }
-  
+
 module.exports = { transit, delivered };

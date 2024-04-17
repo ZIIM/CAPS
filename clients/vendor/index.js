@@ -1,15 +1,32 @@
 const newPackage = require('./handler.js');
-const events = require('../eventPool.js');
 
-function createPayload(){
+const io = require('socket.io-client');
+
+let socket = io.connect('http://localhost:3000/caps');
+
+socket.emit('join', {
+  clientId: 'vendor',
+  store: '1-206-flowers',
+});
+
+socket.on('join', console.log);
+
+function makePayload() {
   let payload = newPackage();
-  events.emit('pickup', payload);
+  socket.emit('pickup', payload);
 }
 
-function delivered(){
-  events.on('delivered',()=>{
-    console.log('VENDOR','Thank you for the delivery!');
-  });
+function delivered() {
+  setTimeout(() => {
+    socket.on('delivered', () => {
+      setTimeout(() => {
+        console.log('VENDOR', 'Thank you for the delivery!');
+      }, 2000);
+    });
+  }, 2000);
 }
 
-module.exports = {createPayload, delivered};
+setInterval(() => {
+  makePayload();
+}, 5000);
+delivered();
