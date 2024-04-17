@@ -4,7 +4,7 @@ const chance = new Chance();
 
 function newPackage(payload){
   return(payload ={
-    store: chance.word({length: 5}),
+    store: '1-206-flowers',
     orderID: chance.natural(),
     customer: chance.name(),
     address: chance.address(),
