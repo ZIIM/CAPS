@@ -1,6 +1,14 @@
-const events = require('./eventPool');
-const driverListening = require('./driver');
-const vendor = require('./vendor');
+// const events = require('./eventPool');
+// const driverListening = require('./driver');
+// const vendor = require('./vendor');
+require('dotenv').config();
+
+const io = require('socket.io');
+
+const PORT = process.env.PORT || 3000;
+
+const server = new io.Server(PORT);
+const caps = server.of('/caps');
 
 let state = {
   event: 'no events yet',
@@ -13,50 +21,39 @@ let state = {
   },
 };
 
-let pickupLogged = false;
-let inTransitLogged = false;
-let deliveredLogged = false;
-
-events.on('pickup', (payload) => {
-  if (!pickupLogged) {
+caps.on('connection', (socket) => {
+  console.log('Client has connected');
+  socket.on('join', (payload) => {
+    socket.join(payload.store);
+    caps.emit('join', payload.clientId + ' has joined the delivery app!');
+  });
+  socket.on('pickup', (payload) => {
     state = {
       event: 'pickup',
       time: new Date(),
       payload: payload,
     };
+    caps.to(payload.store).emit('pickup', payload);
     console.log('EVENT:', state);
-    pickupLogged = true;
-  }
-});
+  });
 
-events.on('inTransit', (payload) => {
-  if (!inTransitLogged) {
+  socket.on('inTransit', (payload) => {
     state = {
       event: 'inTransit',
       time: new Date(),
       payload: payload,
     };
+    caps.to(payload.store).emit('inTransit', payload);
     console.log('EVENT:', state);
-    inTransitLogged = true;
-  }
-});
+  });
 
-events.on('delivered', (payload) => {
-  if (!deliveredLogged) {
+  socket.on('delivered', (payload) => {
     state = {
       event: 'delivered',
       time: new Date(),
       payload: payload,
     };
+    caps.to(payload.store).emit('delivered', payload);
     console.log('EVENT:', state);
-    deliveredLogged = true;
-  }
+  });
 });
-
-//CHAT GPT below, hard time gettting the order right
-vendor.createPayload(); // This emits the 'pickup' event
-driverListening.pickedUP(); // Simulate the driver picking up the package
-vendor.createPayload(); // This emits another 'pickup' event, simulating a new package being picked up
-driverListening.droppingOff(); // Simulate the driver dropping off the package
-vendor.createPayload();
-vendor.delivered(); // This emits the 'delivered' event
