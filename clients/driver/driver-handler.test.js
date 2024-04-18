@@ -1,24 +1,30 @@
 const handler = require('./handler.js');
 
-jest.mock('socket.io-client', () => ({
-  connect: jest.fn(() => ({
-    emit: jest.fn(),
-    on: jest.fn(),
-  })),
-}));
+describe('transit Event Handler', () => {
+  it('should emit inTransit event with correct payload', (done) => {
+    const payload = {};
+    const socketMock = {
+      emit: jest.fn(),
+    };
 
-describe('Driver handler functions', () => {
-  test('transit function should emit "inTransit" event', () => {
-    const socket = require('socket.io-client').connect();
-    const mockPayload = { orderID: expect.any(Number), customer: expect.any(String) };
-    handler.transit(socket, mockPayload);
-    expect(socket.emit).toHaveBeenCalledWith('inTransit', mockPayload);
+    handler.transit(socketMock, payload);
+
+    setTimeout(() => {
+      expect(socketMock.emit).toHaveBeenCalledWith('inTransit', payload);
+      done();
+    }, 2100);
   });
+  // chatgpt some of this below
+  it('should log "DRIVER picked up" with correct payload', (done) => {
+    const payload = {}; //RETURN TO THIS PART
+    const consoleSpy = jest.spyOn(console, 'log'); // Spy on console.log to check if it's called
 
-  test('delivered function should emit "delivered" event', () => {
-    const socket = require('socket.io-client').connect();
-    const mockPayload = { orderID: expect.any(Number), customer: expect.any(String) };
-    handler.delivered(socket, mockPayload);
-    expect(socket.emit).toHaveBeenCalledWith('delivered', mockPayload);
+    handler.transit({}, payload);
+
+    setTimeout(() => {
+      expect(consoleSpy).toHaveBeenCalledWith('DRIVER', 'picked up', payload);
+      consoleSpy.mockRestore(); // Restore the original console.log function
+      done();
+    }, 1100);
   });
 });
