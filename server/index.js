@@ -9,7 +9,6 @@ const caps = server.of('/caps');
 const pickupQue  = new StandardQueue('pickupQue');
 const recievedQue = new FifoQueue('recievedQue');
 const inTransitQue = new StandardQueue('inTransitQue');
-const deliveredQue = new StandardQueue('deliveredQue');
 
 let state = {
   event: 'no events yet',
