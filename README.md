@@ -32,3 +32,4 @@ Plan your workflow efficiently with accurate time estimates for project completi
 - **PLACEHOLDER**: [Estimated time for completion]
 
 ## 🤝 Credit and Collaborations
+- [Brock Britton](https://github.com/brockbritton)
