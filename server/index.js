@@ -1,14 +1,15 @@
-// const events = require('./eventPool');
-// const driverListening = require('./driver');
-// const vendor = require('./vendor');
 require('dotenv').config();
-
 const io = require('socket.io');
-
+const {StandardQueue, FifoQueue} = require('./lib/queue');
 const PORT = process.env.PORT || 3000;
 
 const server = new io.Server(PORT);
 const caps = server.of('/caps');
+
+const pickupQue  = new StandardQueue('pickupQue');
+const recievedQue = new FifoQueue('recievedQue');
+const inTransitQue = new StandardQueue('inTransitQue');
+const deliveredQue = new StandardQueue('deliveredQue');
 
 let state = {
   event: 'no events yet',
