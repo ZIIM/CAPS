@@ -23,37 +23,39 @@ let state = {
 
 caps.on('connection', (socket) => {
   console.log('Client has connected');
+
   socket.on('join', (payload) => {
     socket.join(payload.store);
-    caps.emit('join', payload.clientId + ' has joined the delivery app!');
+    caps.emit('join', `${payload.clientId} has joined the delivery app!`);
   });
+
   socket.on('pickup', (payload) => {
-    state = {
-      event: 'pickup',
-      time: new Date(),
-      payload: payload,
-    };
+    updateState('pickup', payload);
     caps.to(payload.store).emit('pickup', payload);
-    console.log('EVENT:', state);
+    logEvent();
   });
 
   socket.on('inTransit', (payload) => {
-    state = {
-      event: 'inTransit',
-      time: new Date(),
-      payload: payload,
-    };
+    updateState('inTransit', payload);
     caps.to(payload.store).emit('inTransit', payload);
-    console.log('EVENT:', state);
+    logEvent();
   });
 
   socket.on('delivered', (payload) => {
-    state = {
-      event: 'delivered',
-      time: new Date(),
-      payload: payload,
-    };
+    updateState('delivered', payload);
     caps.to(payload.store).emit('delivered', payload);
-    console.log('EVENT:', state);
+    logEvent();
   });
 });
+
+function updateState(event, payload) {
+  state = {
+    event: event,
+    time: new Date(),
+    payload: payload,
+  };
+}
+
+function logEvent() {
+  console.log('EVENT:', state);
+}
